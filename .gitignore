@@ -58,3 +58,7 @@ build.log
 .svn
 .CVS
 .hg*
+
+# JS specific
+node_modules
+WebContent
