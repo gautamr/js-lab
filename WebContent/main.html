@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="us">
+<head>
+
+<meta charset="utf-8">
+<title>JS Lab</title>
+
+<link href="css/smoothness/jquery-ui-1.10.1.custom.css" rel="stylesheet">
+<script type="text/javascript" src="js/jquery-1.9.1.js"></script>
+<script type="text/javascript" src="js/jquery-ui-1.10.1.custom.js"></script>
+<script type="text/javascript" src="finch-colourpicker.js"></script>
+<script type="text/javascript" src="myplugin.js"></script>
+<script type="text/javascript" src="myplugin2.js"></script>
+<script type="text/javascript" src="handlebars.js"></script>
+
+<script id="form-item-tmpl" type="text/x-handlebars-template">
+<div class="formItem"><label for="{{name}}">{{label}}</label><span>{{{elem}}}</span><div class="clear"></div></div>
+</script>
+<script id="form-dropdown-tmpl" type="text/x-handlebars-template">
+    <input type="hidden" name="{{moduleName}}" id="{{moduleId}}" value="{{module}}"></input>
+    <input type="hidden" name="{{keyName}}" id="{{keyId}}" value="{{key}}"></input>
+    <select class="dropdowninput" name="{{valueName}}" id="{{valueId}}">
+      {{#each items}}<option value="{{key}}">{{value}}</option>{{/each}}
+    </select> 
+</script>
+<script id="form-zebracolor-tmpl" type="text/x-handlebars-template">
+    {{#each items}}
+      <input type="hidden" name="{{moduleName}}" id="{{moduleId}}" value="{{module}}"></input>
+      <input type="hidden" name="{{keyName}}" id="{{keyId}}" value="{{key}}"></input>
+      <input type="text" name="{{valueName}}" id="{{valueId}}" value="{{value}}"></input>
+    {{/each}} 
+</script>
+
+<script type="text/javascript">
+    function changeStringToNumber(name) {
+        re = /,/gi;
+        name = name.replace(re, '');
+        return parseFloat(name);
+    }
+
+    var i = changeStringToNumber("123.50");
+    //alert(i);
+
+    $(function() {
+        
+        $("p").click(function() {
+            $(this).hide();
+        });
+
+        var $field = $(".numeric");
+        $field.focusout(function() {
+            $field.val($field.numericVal());
+        });
+
+        $(".finch-numeric").numVal();
+
+        /*Handlebars.registerHelper('elem', function() {
+            return new Handlebars.SafeString(this.elem);
+        });*/
+
+        var localeContext = {
+            module: "inf",
+            key: "LOCALE",
+            value: "ja",
+            type: "dropdown",
+            label: "Language",
+            items: [{key : "en-us", value : "English"}, 
+                    {key : "ja", value : "Japaneese"}]
+        };
+
+        var prinSizeContext = {
+            module: "inf",
+            key: "PRINT_SIZE",
+            value: "A4",
+            type: "dropdown",
+            label: "Print Size",
+            items: [{key : "A4", value : "A4"}, 
+                    {key : "Letter", value : "Leter"}]
+        };
+        
+        var dateFormatContext = {
+            module: "inf",
+            key: "DISPLAY_DATE_FORMAT",
+            value: "yyyyDDMM",
+            type: "dropdown",
+            label: "Display Date Format",
+            items: [{key : "yyyyDDMM", value : "yyyyDDMM"}, 
+                    {key : "DDMMyyyy", value : "DDMMyyyy"},
+                    {key : "DDMMYY", value : "DDMMYY"}]
+            };
+
+        var defaultWorkspaceContext = {
+            module: "dbd",
+            key: "DEFAULT_WORKSPACE",
+            value: "my workspace",
+            type: "dropdown",
+            label: "Default Workspace",
+            items: [{key : "12", value : "My Workspace"}, 
+                    {key : "34", value : "Second Workspace"}]
+            };
+        
+        var zebraContext = {
+                items: [{key: "ZEBRA_COLOR_ODD", value: "#FFFFFF"}, 
+                        {key: "ZEBRA_COLOR_EVEN", value: "#D0FFFF"}],
+                type: "zebracolor",
+                label: "Zebra Color"
+        };
+        
+        var infPrefs = [localeContext, prinSizeContext, dateFormatContext, zebraContext];
+        var dbdPrefs = [defaultWorkspaceContext];
+
+        var jsonPrefs = [{componentLabel: "Core", prefs: infPrefs}, {componentLabel: "Dashboard", prefs: dbdPrefs}];
+        var jsonData = {value: jsonPrefs};
+        
+        var formItemTmpt = Handlebars.compile($("#form-item-tmpl").html());
+        var ddTmpt = Handlebars.compile($("#form-dropdown-tmpl").html());
+        var zcTmpt = Handlebars.compile($("#form-zebracolor-tmpl").html());
+        var i = 0,
+        idPrefix,
+        id,
+        namePrefix,
+        name,
+        elem,
+        item,
+        tabTitle = "<ul>",
+        tabContent = "";
+    $.each(jsonData.value, function(tabIndex, prefsData) {
+        tabTitle += '<li><a href="#tabs-' + tabIndex + '">' + prefsData.componentLabel + '</a></li>';
+        tabContent += '<div id="tabs-' + tabIndex + '">';
+        
+        $.each(prefsData.prefs, function(index, data) {
+            if (data.type === "dropdown") {
+                idPrefix = "compPrefs" + tabIndex + ".prefs" + i;
+                namePrefix = "compPrefs[" + tabIndex + "].prefs[" + i + "]";
+                elem = ddTmpt({
+                    moduleId: idPrefix + ".component",
+                    moduleName: namePrefix + ".component",
+                    module: data.component,
+                    keyId: idPrefix + ".key",
+                    keyName: namePrefix + ".key",
+                    key: data.key,
+                    valueId: idPrefix + ".value",
+                    valueName: namePrefix + ".value",
+                    items : data.items
+                });
+
+                item = formItemTmpt({
+                    name : data.key,
+                    label : data.label,
+                    elem : elem
+                });
+                
+                
+                $item = $($.trim(item));
+                $item.find("select option").filter(function() {
+                    var v = $.trim($(this).val());
+                    return v == data.value; 
+                }).attr('selected', true);
+                var item = $item.html();
+                
+                i++;
+            } else if (data.type === "zebracolor") {
+                $.each(data.items, function(indx, item) {
+                    idPrefix = "compPrefs" + tabIndex + ".prefs" + i;
+                    namePrefix = "compPrefs[" + tabIndex + "].prefs[" + i + "]";
+                    item.moduleId = idPrefix + ".component";
+                    item.moduleName = namePrefix + ".component",
+                    item.module = data.component,                                        
+                    item.keyId = idPrefix + ".key";
+                    item.keyName = namePrefix + ".key";
+                    item.valueId = idPrefix + ".value";
+                    item.valueName = namePrefix + ".value";                                        
+                    i++;
+                });
+                elem = zcTmpt({
+                    items: data.items
+                });
+                item = formItemTmpt({
+                    name: "ZEBRA_COLOR", 
+                    label: data.label, 
+                    elem: elem
+                });
+            }
+            
+            tabContent += item;
+        });
+        tabContent += '</div>';
+    });
+    tabTitle += '</ul>';
+        
+        var prefsTabs = $("#tabs-prefs");
+        prefsTabs.append(tabTitle).append(tabContent);
+        
+        $("#tabs-prefs").tabs().addClass("ui-tabs-vertical ui-helper-clearfix");
+        $("#tabs-prefs").find("li").removeClass("ui-corner-top").addClass("ui-corner-left");
+        
+        $("#submit-bttn").click(function() {
+            var $items = $("#form-item .formItem");
+            $.each($items, function(index, item) {
+                var itm = item;
+                var $itm = $(item);
+                var m = $itm.find(".frm-mod").val();
+                var k = $itm.find(".frm-key").val();
+                var v = $itm.find("select").val();
+                var next = v;
+            });
+        });
+    });
+    
+</script>
+</head>
+<body>
+  <div id='did-1'>I love JavaScript</div>
+  <div id='did-2'>Test It</div>
+  
+  <p id="demo">This is a paragraph.</p>
+  <p>If you click on me, I will disappear.</p>
+  <p>Click me away!</p>
+  <p>Click me too!</p>
+  
+
+  <input id="hb-test" type="button">
+
+  <input class="numeric" type="text">
+  <input type="text">
+  <input class="finch-numeric" type="text">
+  <input class="finch-numeric" type="text">
+
+
+  <form action="#">
+  
+    <div id="tabs-prefs"></div>
+    
+    <input id="submit-bttn" type="button" title="Submit">
+  </form>
+</body>
+</html>

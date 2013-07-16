@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="us">
+<head>
+
+<meta charset="utf-8">
+<title>JS Puzzlers</title>
+
+<script type="text/javascript" src="js/jquery-1.9.1.js"></script>
+<script type="text/javascript" src="js/puzzlers/puzzler01.js"></script>
+<script type="text/javascript" src="js/puzzlers/puzzler01_sol.js"></script>
+<script type="text/javascript" src="js/puzzlers/puzzler02.js"></script>
+<script type="text/javascript" src="js/puzzlers/puzzler06.js"></script>
+<!--script type="text/javascript" src="js/puzzlers/puzzler07.js"></script-->
+<!--script type="text/javascript" src="js/puzzlers/puzzler08.js"></script-->
+<script type="text/javascript" src="js/puzzlers/puzzler09.js"></script>
+<script type="text/javascript" src="js/puzzlers/puzzler10.js"></script>
+
+<script type="text/javascript" src="js/object01.js"></script>
+
+<script type="text/javascript">
+    $(function() {
+        $('#pzlr01').click(puzzler01);
+		$('#pzlr01-sol').click(puzzler01_sol);
+		$('#pzlr02').click(puzzler02);
+		
+		$('#pzlr0901').click(function() {
+		    var r1 = fun1();
+			console.log(r1);
+		});
+		$('#pzlr0902').click(function() {
+		    var r2 = fun2();
+			console.log(r2);
+		});
+		
+		$('#pzlr10').click(function() {
+            puzzle10();
+		});
+		
+		var obj = new MyObject();
+		
+    });   
+</script>
+</head>
+<body>
+  <input id="pzlr01" type="button" value="Puzzler 01">
+  <input id="pzlr01-sol" type="button" value="Puzzler 01 Sol">
+  <input id="pzlr02" type="button" value="Puzzler 02">
+  <input id="pzlr0901" type="button" value="Puzzler 09 - 01">
+  <input id="pzlr0902" type="button" value="Puzzler 09 - 02">
+  <input id="pzlr10" type="button" value="Puzzler 10">
+</body>
+</html>

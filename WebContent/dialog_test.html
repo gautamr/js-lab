@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="us">
+<head>
+
+<meta charset="utf-8">
+<title>JS Lab - dialog test</title>
+
+<link href="css/smoothness/jquery-ui-1.10.1.custom.css" rel="stylesheet">
+<script type="text/javascript" src="js/jquery-1.9.1.js"></script>
+<script type="text/javascript" src="js/jquery-ui-1.10.1.custom.js"></script>
+
+
+<script type="text/javascript">
+
+
+    $(function() {
+        $('#submit-bttn').click(function() {
+		    $taskDialog = $('<div id="taskDialog"></div>');
+			//$taskDialog.dialog({ draggable: false });
+				
+			$taskDialog.dialog({
+                dialogClass: "no-close",
+			    draggable: false,
+                buttons: [
+				{
+				  text: "OK",
+				  click: function() {
+					$( this ).dialog( "close" );
+				  }
+				}]
+            });
+		});
+    });
+    
+</script>
+</head>
+<body>
+
+
+
+
+    
+    <input id="submit-bttn" type="button" title="Submit">
+
+</body>
+</html>
