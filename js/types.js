@@ -35,6 +35,7 @@ console.log(today);
 console.log(rx1);
 console.log(rx2);
 console.log(objn);
+console.log(err);
 
 (function() {
     console.log('following variable "undef" should be undefined');
